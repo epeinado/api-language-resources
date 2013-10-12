@@ -1,0 +1,138 @@
+import getopt
+import tornado.ioloop
+import tornado.web
+import sys
+from api_resources import Resources
+
+import time
+
+class Synonym(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        word = self.get_argument("word")
+        pos = self.get_argument("pos")
+        language = self.get_argument("language")
+        # Create DS to save result
+        response = {}
+
+        response["sentiment"] = sentiwordnet.get_synonym(word, pos, language)
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
+class GetSentiment(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        text = self.get_argument("text")
+        language = self.get_argument("language")
+        # Create DS to save result
+        response = {}
+
+        response["sentiment"] = sentiwordnet.get_sentiment(text, language)
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
+class PosTagging(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        text = self.get_argument("text")
+        language = self.get_argument("language")
+        # Create DS to save result
+        response = {}
+
+        response["postagging"] = sentiwordnet.get_postagging(text, language)
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
+class GetInformation(tornado.web.RequestHandler):
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        word = self.get_argument("word")
+        pos = self.get_argument("pos")
+        language = self.get_argument("language")
+
+        score = sentiwordnet.get_info_first_word(word, pos, language)
+
+        # Create DS to save result
+        response = {}
+        response["score"] = score
+
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
+
+class Translator(tornado.web.RequestHandler):
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        word = self.get_argument("word")
+        pos = self.get_argument("pos")
+        from_language = self.get_argument("from_language")
+        to_language = self.get_argument("to_language")
+
+        translation = sentiwordnet.get_translation(word, pos, from_language, to_language)
+
+        # Create DS to save result
+        response = {}
+        response["translation"] = translation
+
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
+# Check if server por is valid
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "p:", ["port="])
+    assert (len(opts) == 1)
+except:
+    print 'api_resources_service.py -p <port>'
+    sys.exit()
+
+for o, a in opts:
+    if o == "-p":
+        port = a
+    else:
+        pass
+
+if __name__ == "__main__":
+    # Init treetagger with a specific language
+    sentiwordnet = Resources()
+
+    # Init Tornado web server
+    application = tornado.web.Application([
+        (r"/get_information", GetInformation, dict(sentiwordnet=sentiwordnet)),
+        (r"/translate", Translator, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_synonym", Synonym, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_postagging", PosTagging, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_sentiment", GetSentiment, dict(sentiwordnet=sentiwordnet)),
+    ])
+
+    # Listen on specific port and start server
+    application.listen(port)
+    tornado.ioloop.IOLoop.instance().start()
