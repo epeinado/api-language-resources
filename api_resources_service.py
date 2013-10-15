@@ -25,6 +25,42 @@ class Synonym(tornado.web.RequestHandler):
         # Return result
         self.write(response)
 
+class GetAffect(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        text = self.get_argument("text")
+        language = self.get_argument("language")
+        # Create DS to save result
+        response = {}
+
+        response["affects"] = sentiwordnet.get_affects(text, language)
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
+class GetDommain(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        text = self.get_argument("text")
+        language = self.get_argument("language")
+        # Create DS to save result
+        response = {}
+
+        response["dommains"] = sentiwordnet.get_domains(text, language)
+        response["elapsed_time"] = time.time() - start
+        # Return result
+        self.write(response)
+
 class GetSentiment(tornado.web.RequestHandler):
 
     def initialize(self, sentiwordnet):
@@ -131,6 +167,8 @@ if __name__ == "__main__":
         (r"/get_synonym", Synonym, dict(sentiwordnet=sentiwordnet)),
         (r"/get_postagging", PosTagging, dict(sentiwordnet=sentiwordnet)),
         (r"/get_sentiment", GetSentiment, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_affect", GetAffect, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_dommain", GetDommain, dict(sentiwordnet=sentiwordnet)),
     ])
 
     # Listen on specific port and start server

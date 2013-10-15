@@ -27,7 +27,7 @@ class Resources:
         """
         # Init treetagger with a specific language
         self.treetagger_english = treetagger.TreeTagger(encoding='latin-1', language="english")
-        self.treetagger_spanish = treetagger.TreeTagger(encoding='latin-1', language="spanish")
+        self.treetagger_spanish = treetagger.TreeTagger(encoding='utf8', language="spanish")
         self.tt_to_wordnet = treetagger_wordnet.TreetaggerToWordnet()
 
         """
@@ -237,49 +237,33 @@ class Resources:
     def get_postagging(self, text, language):
         # Perform PosTagging
         response = []
-        for postag in self.treetagger_english.tag(text):
-            element = {}
-            # Word
-            element["word"] = postag[0]
-            # Postaging
-            element["postagging"] = postag[1]
-            # Wordnet postagging mapping
-            element["pos"] = self.tt_to_wordnet.wordnet_morph_category(self.map_lenguage[language], postag[1])
-            # Lemma
-            element["lemma"] = postag[2]
-            response.append(element)
+        if language == "english":
+            for postag in self.treetagger_english.tag(text):
+                element = {}
+                # Word
+                element["word"] = postag[0]
+                # Postaging
+                element["postagging"] = postag[1]
+                # Wordnet postagging mapping
+                element["pos"] = self.tt_to_wordnet.wordnet_morph_category(self.map_lenguage[language], postag[1])
+                # Lemma
+                element["lemma"] = postag[2]
+                response.append(element)
+        if language == "spanish":
+            for postag in self.treetagger_spanish.tag(text):
+                element = {}
+                # Word
+                element["word"] = postag[0]
+                # Postaging
+                element["postagging"] = postag[1]
+                # Wordnet postagging mapping
+                element["pos"] = self.tt_to_wordnet.wordnet_morph_category(self.map_lenguage[language], postag[1])
+                # Lemma
+                element["lemma"] = postag[2]
+                response.append(element)
 
         return response
 
-    #
-    # def get_sentiment(self, word, pos, language):
-    #     """Return the sentiment of a given word, part of speech and language
-    #         :param word: word to analize the sentiment
-    #         :param pos: part of speech (n:Noun, a:Adjetive, v:Verb, r=Adverb)
-    #         :param language: language
-    #     """
-    #     map_lenguage = {"english": "en",
-    #                     "spanish": "sp"}
-    #     lang = map_lenguage[language]
-    #     # Assert input params
-    #     assert (lang in ["sp", "en"])
-    #     # Check if word and pos exists into the dict
-    #     if word in self.sentiwordnet[lang]:
-    #         if pos in self.sentiwordnet[lang][word]:
-    #             result = self.sentiwordnet[lang][word][pos]
-    #             result["domains"] = []
-    #             result["affects"] = []
-    #             if self.has_domain(result["synset"], result["pos"]):
-    #                 result["domains"] = self.get_domain(result["synset"], result["pos"])
-    #             if self.has_affect(result["synset"], result["pos"]):
-    #                 result["affects"] = self.get_affect(result["synset"], result["pos"])
-    #             return result
-    #         else:
-    #             return None
-    #     else:
-    #         return None
-    #
-    #
     def get_translation(self, word, pos, from_language, to_language):
         map_lenguage = {"english": "en",
                         "spanish": "sp"}
@@ -301,8 +285,45 @@ class Resources:
         else:
             return None
 
+    def get_affect_text(self, text, language):
+        affects = {}
+        for word in text:
+            synset = self.get_first_synset(word["word"], word["pos"], language)
+            if synset is not None:
+                if self.has_affect(synset, word["pos"]):
+                    affect = self.get_affect(synset, word["pos"])
+                    for af in affect:
+                        if af not in affects.keys():
+                            affects[af] = 1
+                        else:
+                            affects[af] += 1
+        return affects
+
+    def get_affects(self, text, language):
+        posttext = self.get_postagging(text, language)
+        return self.get_affect_text(posttext, language)
+
+    def get_domains_text(self, text, language):
+        dommains = {}
+        for word in text:
+            synset = self.get_first_synset(word["word"], word["pos"], language)
+            if synset is not None:
+                if self.has_domain(synset, word["pos"]):
+                    dommain = self.get_domain(synset, word["pos"])
+                    for af in dommain:
+                        if af not in dommains.keys():
+                            dommains[af] = 1
+                        else:
+                            dommains[af] += 1
+        return dommains
+
+    def get_domains(self, text, language):
+        posttext = self.get_postagging(text, language)
+        return self.get_domains_text(posttext, language)
+
     def get_sentiment_text(self, text, language):
         sentiment = {}
+        sentiment["words"] = {}
         sentiment["positive"] = 0
         sentiment["negative"] = 0
         for word in text:
@@ -311,7 +332,9 @@ class Resources:
                 if self.has_senti(synset, word["pos"]):
                     senti = self.get_senti(synset, word["pos"])
                     sentiment["positive"] = sentiment["positive"] + float(senti["positive"][1:])
-                    sentiment["negative"] = sentiment["negative"] + float(senti["positive"][1:])
+                    sentiment["negative"] = sentiment["negative"] + float(senti["negative"][1:])
+                    if senti["positive"] != "+0" or senti["negative"] != "-0":
+                        sentiment["words"][word["lemma"]] = senti
         return sentiment
 
     def get_sentiment(self, text, language):
@@ -322,19 +345,6 @@ class Resources:
     def get_info_first_word(self, word, pos, language):
         synset = self.get_first_synset(word, pos, language)
         return self.get_info(synset, pos)
-    # todo: terminar este método
-    # def get_affects(self, text, language):
-    #     affects = {}
-    #     for word in text:
-    #         synset = self.get_first_synset(word["word"], word["pos"], language)
-    #         if synset is not None:
-    #             if self.has_affect(synset, word["pos"]):
-    #                 affects = self.get_affect(synset, word["pos"])
-    #
-    #                 sentiment["positive"] = sentiment["positive"] + float(senti["positive"][1:])
-    #                 sentiment["negative"] = sentiment["negative"] + float(senti["positive"][1:])
-    #     return sentiment
-
 
 if __name__ == "__main__":
     # Init class
@@ -366,4 +376,10 @@ if __name__ == "__main__":
 
     # print(sentiwordnet.get_sentiment([{"word": "buy", "pos": "v"}, {"word": "new", "pos": "r"}], "english"))
 
-    print(sentiwordnet.get_postagging("I am a good boy", "english"))
+    # print(sentiwordnet.get_postagging("I am a good boy", "english"))
+
+    # print(sentiwordnet.get_affects("amado amado amado", "spanish"))
+
+    print(sentiwordnet.get_sentiment(
+        "Cuando Gregorio Samsa se despertó una mañana después de un sueño intranquilo, se encontró sobre su cama convertido en un monstruoso insecto. Estaba tumbado sobre su espalda dura, y en forma de caparazón y, al levantar un poco la cabeza veía un vientre abombado, parduzco, dividido por partes duras en forma de arco, sobre cuya protuberancia apenas podía mantenerse el cobertor, a punto ya de resbalar al suelo. Sus muchas patas, ridículamente pequeñas en comparación con el resto de su tamaño, le vibraban desamparadas ante los ojos.",
+        "spanish"))
