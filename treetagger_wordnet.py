@@ -6,6 +6,24 @@ class TreetaggerToWordnet():
     """
 
     def __init__(self):
+        self.fr_mapping = {
+                            "ADJ" : "adv",
+                            "ADV" : "adj",
+                            "NAM" : "noun",
+                            "NOM" : "noun",
+                            "NUM" : "noun",
+                            "VER:cond" : "verb",
+                            "VER:futu" : "verb",
+                            "VER:impe" : "verb",
+                            "VER:impf" : "verb",
+                            "VER:infi" : "verb",
+                            "VER:pper" : "verb",
+                            "VER:ppre" : "verb",
+                            "VER:pres" : "verb",
+                            "VER:simp" : "verb",
+                            "VER:subi" : "verb",
+                            "VER:subp" : "verb"
+        }
         self.es_mapping = {"ADJ": "adj",
                            "ADV": "adv",
                            "NC": "noun",
@@ -59,17 +77,37 @@ class TreetaggerToWordnet():
                            "ADV": "adv",
                            "N": "noun",
                            "V": "verb"}
+        self.it_mapping = { "ADJ" : "adj",
+                            "ADV" : "adv",
+                            "NOM" :"noun",
+                            "NPR" : "noun",
+                            "NUM" : "noun",
+                            "VER:cimp" : "verb",
+                            "VER:cond" : "verb",
+                            "VER:cpre" : "verb",
+                            "VER:futu" : "verb",
+                            "VER:geru" : "verb",
+                            "VER:impe" : "verb",
+                            "VER:impf" : "verb",
+                            "VER:infi" : "verb",
+                            "VER:pper" : "verb",
+                            "VER:ppre" : "verb",
+                            "VER:pres" :  "verb",
+                            "VER:refl:infi" : "verb",
+                            "VER:remo" : "verb"}
         self.ca_mapping = {}
         self.mapping = {
-            "sp": self.es_mapping,
-            "en": self.en_mapping,
-            "pt": self.pt_mapping,
-            "ca": self.ca_mapping
+                            "sp": self.es_mapping,
+                            "en": self.en_mapping,
+                            "pt": self.pt_mapping,
+                            "it": self.it_mapping,
+                            "ca": self.ca_mapping,
+                            "fr": self.fr_mapping
         }
-        self.short_mapping={"adj": "r",
-                                   "adv": "a",
-                                   "noun": "n",
-                                   "verb": "v"}
+        self.short_mapping={"adj": "a",
+                            "adv": "r",
+                            "noun": "n",
+                            "verb": "v"}
 
     def wordnet_morph_category(self, lang, postag):
         """
