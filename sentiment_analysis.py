@@ -1,5 +1,4 @@
 from lxml import etree
-from api_resources import Resources
 import logging
 
 MARL_NS = 'http://purl.org/marl/ns#'
@@ -9,8 +8,8 @@ NSMAP = {"marl" : MARL_NS,
 
 class SentimentAnalysis:
 
-    def __init__(self, text, language):
-        self.sentiwordnet = Resources()
+    def __init__(self, text, language, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
         self.text = text
         self.language = language
         self.result = etree.Element("{%s}opinion" % MARL_NS, nsmap = NSMAP)

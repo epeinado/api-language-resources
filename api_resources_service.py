@@ -92,7 +92,7 @@ class GetSentiment(tornado.web.RequestHandler):
         language = self.get_argument("language")
 
         if self.get_argument("format", None) == "xml":
-            sentiment = SentimentAnalysis("Movistar me gusta mucho", "es")
+            sentiment = SentimentAnalysis(text, language, self.sentiwordnet)
             sentiment.analyze()
             response = sentiment.tostring()
             self.write(response)
