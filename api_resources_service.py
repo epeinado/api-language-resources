@@ -3,6 +3,7 @@ import tornado.ioloop
 import tornado.web
 import sys
 from api_resources import Resources
+from sentiment_analysis import SentimentAnalysis
 
 import time
 
@@ -17,13 +18,19 @@ class Synonym(tornado.web.RequestHandler):
         word = self.get_argument("word")
         pos = self.get_argument("pos")
         language = self.get_argument("language")
-        # Create DS to save result
-        response = {}
 
-        response["sentiment"] = sentiwordnet.get_synonym(word, pos, language)
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["sentiment"] = sentiwordnet.get_synonym(word, pos, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 class GetAffect(tornado.web.RequestHandler):
 
@@ -35,13 +42,19 @@ class GetAffect(tornado.web.RequestHandler):
         # Check input text
         text = self.get_argument("text")
         language = self.get_argument("language")
-        # Create DS to save result
-        response = {}
 
-        response["affects"] = sentiwordnet.get_affects(text, language)
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["affects"] = sentiwordnet.get_affects(text, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 class GetDommain(tornado.web.RequestHandler):
 
@@ -53,13 +66,19 @@ class GetDommain(tornado.web.RequestHandler):
         # Check input text
         text = self.get_argument("text")
         language = self.get_argument("language")
-        # Create DS to save result
-        response = {}
 
-        response["dommains"] = sentiwordnet.get_domains(text, language)
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["dommains"] = sentiwordnet.get_domains(text, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 class GetSentiment(tornado.web.RequestHandler):
 
@@ -71,13 +90,20 @@ class GetSentiment(tornado.web.RequestHandler):
         # Check input text
         text = self.get_argument("text")
         language = self.get_argument("language")
-        # Create DS to save result
-        response = {}
 
-        response["sentiment"] = sentiwordnet.get_sentiment(text, language)
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+        if self.get_argument("format", None) == "xml":
+            sentiment = SentimentAnalysis("Movistar me gusta mucho", "es")
+            sentiment.analyze()
+            response = sentiment.tostring()
+            self.write(response)
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["sentiment"] = sentiwordnet.get_sentiment(text, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 class PosTagging(tornado.web.RequestHandler):
 
@@ -90,13 +116,19 @@ class PosTagging(tornado.web.RequestHandler):
         # Check input text
         text = self.get_argument("text")
         language = self.get_argument("language")
-        # Create DS to save result
-        response = {}
 
-        response["postagging"] = sentiwordnet.get_postagging(text, language)
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["postagging"] = sentiwordnet.get_postagging(text, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 class GetInformation(tornado.web.RequestHandler):
     def initialize(self, sentiwordnet):
@@ -111,13 +143,18 @@ class GetInformation(tornado.web.RequestHandler):
 
         score = sentiwordnet.get_info_first_word(word, pos, language)
 
-        # Create DS to save result
-        response = {}
-        response["score"] = score
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+            response["score"] = score
 
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 
 class Translator(tornado.web.RequestHandler):
@@ -134,13 +171,18 @@ class Translator(tornado.web.RequestHandler):
 
         translation = sentiwordnet.get_translation(word, pos, from_language, to_language)
 
-        # Create DS to save result
-        response = {}
-        response["translation"] = translation
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+            response["translation"] = translation
 
-        response["elapsed_time"] = time.time() - start
-        # Return result
-        self.write(response)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
 
 # Check if server por is valid
 try:
