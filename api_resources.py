@@ -13,7 +13,6 @@ class Resources:
     English and Spanish words
     """
 
-
     def __init__(self):
         """
         Initialite datastructures
@@ -33,7 +32,6 @@ class Resources:
         self.treetagger_italian = treetagger.TreeTagger(encoding='utf8', language="italian")
         self.treetagger_portuguese = treetagger.TreeTagger(encoding='latin-1', language="portuguese")
         self.treetagger_french = treetagger.TreeTagger(encoding='utf8', language="french")
-        # self.treetagger_portuguese = treetagger.TreeTagger(encoding='latin-1', language="galician")
 
         self.tt_to_wordnet = treetagger_wordnet.TreetaggerToWordnet()
 
@@ -220,10 +218,15 @@ class Resources:
         else:
             return None
 
-
     def get_affect(self, synset, pos):
         if pos + '#' + synset in self.affects:
             return self.affects[pos + '#' + synset]
+        else:
+            return None
+
+    def get_meaning(self, synset, pos):
+        if pos + '#' + synset in self.synsets_en:
+            return self.synsets_en[pos + '#' + synset]["meaning"]
         else:
             return None
 
@@ -239,20 +242,17 @@ class Resources:
         else:
             return False
 
-
     def has_affect(self, synset, pos):
         if pos + '#' + synset in self.affects:
             return True
         else:
             return False
 
-
     def has_word(self, word, pos, language):
         if pos + '#' + word in self.words_en:
             return True
         else:
             return False
-
 
     def get_first_synset(self, word, pos, language):
         if pos is None or word is None:
@@ -318,6 +318,7 @@ class Resources:
 
     def get_info(self, synset, pos):
         result = {}
+        result["meaning"] = self.get_meaning(synset, pos)
         result["synset"] = synset
         result["pos"] = pos
         result["domain"] = self.get_domain(synset, pos)
@@ -466,6 +467,41 @@ class Resources:
         posttext = self.get_postagging(text, language)
         return self.get_domains_text(posttext, language)
 
+    def get_info_word(self, word, pos, language):
+        if pos is None or word is None:
+            return None
+        lan = self.map_lenguage[language]
+        if lan == "en":
+            if pos + '#' + word in self.words_en:
+                synsets = self.words_en[pos + '#' + word]["synsets"]
+            else:
+                return None
+        if lan == "sp":
+            if pos + '#' + word in self.words_sp:
+                synsets = self.words_sp[pos + '#' + word]["synsets"]
+            else:
+                return None
+        if lan == "it":
+            if pos + '#' + word in self.words_it:
+                synsets = self.words_it[pos + '#' + word]["synsets"]
+            else:
+                return None
+        if lan == "pt":
+            if pos + '#' + word in self.words_pt:
+                synsets = self.words_pt[pos + '#' + word]["synsets"]
+            else:
+                return None
+        if lan == "fr":
+            if pos + '#' + word in self.words_fr:
+                synsets = self.words_fr[pos + '#' + word]["synsets"]
+            else:
+                return None
+        results = {}
+        for synset in synsets:
+            results[synset+'#'+pos] = self.get_info(synset, pos)
+        return results
+
+
     def get_sentiment_text(self, text, language):
         sentiment = {}
         sentiment["words"] = {}
@@ -488,10 +524,10 @@ class Resources:
         posttext = self.get_postagging(text, language)
         return self.get_sentiment_text(posttext, language)
 
-
     def get_info_first_word(self, word, pos, language):
         synset = self.get_first_synset(word, pos, language)
         return self.get_info(synset, pos)
+
 
 if __name__ == "__main__":
     # Init class
@@ -512,8 +548,8 @@ if __name__ == "__main__":
 
 
     #
-    print("***INFO DE UN SYNSET***")
-    print(sentiwordnet.get_info("00042769", "r"))
+    # print("***INFO DE UN SYNSET***")
+    # print(sentiwordnet.get_info("00042769", "r"))
     # print("***TRADUCCION DE UNA PALABRA***")
     # print(sentiwordnet.get_translation("good", "n", "english", "spanish"))
     # print(sentiwordnet.get_translation("diorama", "n", "spanish", "english"))
@@ -526,6 +562,8 @@ if __name__ == "__main__":
     # print(sentiwordnet.get_postagging("I am a good boy", "english"))
 
     # print(sentiwordnet.get_affects("amado amado amado", "spanish"))
+    print("***INFO DE UNA PALABRA***")
+    print(sentiwordnet.get_info_word("good","n","english"))
 
     # print(sentiwordnet.get_sentiment(
     #     "Cuando Gregorio Samsa se despertó una mañana después de un sueño intranquilo, se encontró sobre su cama convertido en un monstruoso insecto. Estaba tumbado sobre su espalda dura, y en forma de caparazón y, al levantar un poco la cabeza veía un vientre abombado, parduzco, dividido por partes duras en forma de arco, sobre cuya protuberancia apenas podía mantenerse el cobertor, a punto ya de resbalar al suelo. Sus muchas patas, ridículamente pequeñas en comparación con el resto de su tamaño, le vibraban desamparadas ante los ojos.",

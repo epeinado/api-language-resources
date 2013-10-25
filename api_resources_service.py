@@ -7,6 +7,31 @@ from sentiment_analysis import SentimentAnalysis
 
 import time
 
+class GetWordInformation(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        word = self.get_argument("word")
+        pos = self.get_argument("pos")
+        language = self.get_argument("language")
+
+        if self.get_argument("format", None) == "xml":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>XML response not implemented</body></html>")
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["synsets"] = sentiwordnet.get_info_word(word, pos, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
+
 class Synonym(tornado.web.RequestHandler):
 
     def initialize(self, sentiwordnet):
@@ -211,6 +236,7 @@ if __name__ == "__main__":
         (r"/get_sentiment", GetSentiment, dict(sentiwordnet=sentiwordnet)),
         (r"/get_affect", GetAffect, dict(sentiwordnet=sentiwordnet)),
         (r"/get_dommain", GetDommain, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_word_information", GetWordInformation, dict(sentiwordnet=sentiwordnet)),
     ])
 
     # Listen on specific port and start server
