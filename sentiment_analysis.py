@@ -1,4 +1,3 @@
-from lxml import etree
 from pyld import jsonld
 import json
 import logging
