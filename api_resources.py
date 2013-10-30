@@ -501,7 +501,6 @@ class Resources:
             results[synset+'#'+pos] = self.get_info(synset, pos)
         return results
 
-
     def get_sentiment_text(self, text, language):
         sentiment = {}
         sentiment["words"] = {}
@@ -518,6 +517,15 @@ class Resources:
                         senti["synset"] = synset
                         senti["pos"] = word["pos"]
                         sentiment["words"][word["lemma"]] = senti
+        return sentiment
+
+    def get_sentiment_and_emotion(self, text, language):
+        sentiment = {}
+        sentiment_result = self.get_sentiment(text, language)
+        affect_result = self.get_affects(text, language)
+        sentiment["positive"] = sentiment_result["positive"]
+        sentiment["negative"] = sentiment_result["negative"]
+        sentiment["affects"] = affect_result["affects"] if 'affects' in affect_result.keys() else []
         return sentiment
 
     def get_sentiment(self, text, language):

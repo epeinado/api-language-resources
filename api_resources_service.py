@@ -130,6 +130,31 @@ class GetSentiment(tornado.web.RequestHandler):
             # Return result
             self.write(response)
 
+class GetSentimentEmotion(tornado.web.RequestHandler):
+
+    def initialize(self, sentiwordnet):
+        self.sentiwordnet = sentiwordnet
+
+    def get(self):
+        start = time.time()
+        # Check input text
+        text = self.get_argument("text")
+        language = self.get_argument("language")
+
+        if self.get_argument("format", None) == "xml":
+            sentiment = SentimentAnalysis(text, language, self.sentiwordnet)
+            sentiment.analyze()
+            response = sentiment.tostring()
+            self.write(response)
+        else:
+            # Create DS to save result
+            response = {}
+
+            response["sentiment"] = sentiwordnet.get_sentiment_and_emotion(text, language)
+            response["elapsed_time"] = time.time() - start
+            # Return result
+            self.write(response)
+
 class PosTagging(tornado.web.RequestHandler):
 
     def initialize(self, sentiwordnet):
@@ -237,6 +262,7 @@ if __name__ == "__main__":
         (r"/get_affect", GetAffect, dict(sentiwordnet=sentiwordnet)),
         (r"/get_dommain", GetDommain, dict(sentiwordnet=sentiwordnet)),
         (r"/get_word_information", GetWordInformation, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_sentiment_emotion", GetSentimentEmotion, dict(sentiwordnet=sentiwordnet)),
     ])
 
     # Listen on specific port and start server
