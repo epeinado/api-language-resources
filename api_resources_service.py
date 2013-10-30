@@ -149,7 +149,7 @@ class GetSentimentEmotion(tornado.web.RequestHandler):
             # Create DS to save result
             response = {}
 
-            response["sentiment"] = sentiwordnet.get_sentiment_and_emotion(text, language)
+            response.update(sentiwordnet.get_sentiment_and_emotion(text, language))
             response["elapsed_time"] = time.time() - start
             # Return result
             self.write(response)

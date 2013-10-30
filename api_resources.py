@@ -523,9 +523,14 @@ class Resources:
         sentiment = {}
         sentiment_result = self.get_sentiment(text, language)
         affect_result = self.get_affects(text, language)
-        sentiment["positive"] = sentiment_result["positive"]
-        sentiment["negative"] = sentiment_result["negative"]
-        sentiment["affects"] = affect_result["affects"] if 'affects' in affect_result.keys() else []
+        sentiment["sentiment"] = sentiment_result["positive"] - sentiment_result["negative"]
+        # sentiment["positive"] = sentiment_result["positive"]
+        # sentiment["negative"] = sentiment_result["negative"]
+        # sentiment["affects"] = affect_result["affects"] if 'affects' in affect_result.keys() else []
+        affects = affect_result.get("affects", {})
+        if affects:
+            max_affect = max(affects, key=affects.get)
+            sentiment["emotion"] = max_affect
         return sentiment
 
     def get_sentiment(self, text, language):
