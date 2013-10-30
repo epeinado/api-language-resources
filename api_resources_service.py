@@ -19,10 +19,10 @@ class GetWordInformation(tornado.web.RequestHandler):
         pos = self.get_argument("pos")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -44,10 +44,10 @@ class Synonym(tornado.web.RequestHandler):
         pos = self.get_argument("pos")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -68,10 +68,10 @@ class GetAffect(tornado.web.RequestHandler):
         text = self.get_argument("text")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -92,10 +92,10 @@ class GetDommain(tornado.web.RequestHandler):
         text = self.get_argument("text")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -116,11 +116,10 @@ class GetSentiment(tornado.web.RequestHandler):
         text = self.get_argument("text")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
-            sentiment = SentimentAnalysis(text, language, self.sentiwordnet)
-            sentiment.analyze()
-            response = sentiment.tostring()
-            self.write(response)
+        if self.get_argument("format", None) == "onyx":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -141,7 +140,7 @@ class GetSentimentEmotion(tornado.web.RequestHandler):
         text = self.get_argument("text")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             sentiment = SentimentAnalysis(text, language, self.sentiwordnet)
             sentiment.analyze()
             response = sentiment.tostring()
@@ -167,10 +166,10 @@ class PosTagging(tornado.web.RequestHandler):
         text = self.get_argument("text")
         language = self.get_argument("language")
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -193,10 +192,10 @@ class GetInformation(tornado.web.RequestHandler):
 
         score = sentiwordnet.get_info_first_word(word, pos, language)
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
@@ -221,10 +220,10 @@ class Translator(tornado.web.RequestHandler):
 
         translation = sentiwordnet.get_translation(word, pos, from_language, to_language)
 
-        if self.get_argument("format", None) == "xml":
+        if self.get_argument("format", None) == "onyx":
             self.clear()
             self.set_status(400)
-            self.finish("<html><body>XML response not implemented</body></html>")
+            self.finish("<html><body>ONYX response not implemented</body></html>")
         else:
             # Create DS to save result
             response = {}
