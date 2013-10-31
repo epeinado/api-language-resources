@@ -531,6 +531,8 @@ class Resources:
         if affects:
             max_affect = max(affects, key=affects.get)
             sentiment["emotion"] = max_affect
+        else:
+            sentiment["emotion"] = ""
         return sentiment
 
     def get_sentiment(self, text, language):
