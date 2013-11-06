@@ -16,7 +16,7 @@ class GetWordInformation(tornado.web.RequestHandler):
         start = time.time()
         # Check input text
         word = self.get_argument("word")
-        pos = self.get_argument("pos")
+        pos = self.get_argument("pos", ['v', 'n', 'a', 'r'])
         language = self.get_argument("language")
 
         if self.get_argument("format", None) == "onyx":
@@ -26,9 +26,16 @@ class GetWordInformation(tornado.web.RequestHandler):
         else:
             # Create DS to save result
             response = {}
-
-            response["synsets"] = sentiwordnet.get_info_word(word, pos, language)
-            response["elapsed_time"] = time.time() - start
+            if isinstance(pos, list):
+                response['synsets'] = {}
+                for postagging in pos:
+                    pos_result = sentiwordnet.get_info_word(word, postagging, language)
+                    if pos_result:
+                        response['synsets'].update(pos_result)
+                response["elapsed_time"] = time.time() - start
+            else:
+                response["synsets"] = sentiwordnet.get_info_word(word, pos, language)
+                response["elapsed_time"] = time.time() - start
             # Return result
             self.write(response)
 
