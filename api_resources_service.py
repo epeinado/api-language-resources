@@ -73,7 +73,7 @@ class GetAffect(tornado.web.RequestHandler):
         start = time.time()
         # Check input text
         text = self.get_argument("text")
-        language = self.get_argument("language")
+        language = self.get_argument("language").encode('ascii', errors='ignore')
 
         if self.get_argument("format", None) == "onyx":
             self.clear()
@@ -120,7 +120,7 @@ class GetSentiment(tornado.web.RequestHandler):
     def get(self):
         start = time.time()
         # Check input text
-        text = self.get_argument("text")
+        text = self.get_argument("text").encode('ascii', errors='ignore')
         language = self.get_argument("language")
 
         if self.get_argument("format", None) == "onyx":
