@@ -18,7 +18,7 @@ class Resources:
         Initialite datastructures
         """
         self.map_lenguage = {"english": "en",
-                             "spanish": "sp",
+                             "spanish": "es",
                              "italian": "it",
                              "portuguese": "pt",
                              "french": "fr"}
@@ -263,7 +263,7 @@ class Resources:
                 return self.words_en[pos + '#' + word]["synsets"][0]
             else:
                 return None
-        if lan == "sp":
+        if lan == "es":
             if pos + '#' + word in self.words_sp:
                 return self.words_sp[pos + '#' + word]["synsets"][0]
             else:
@@ -293,7 +293,7 @@ class Resources:
                 return self.synsets_en[pos + '#' + synset]["words"]
             else:
                 return None
-        if lan == "sp":
+        if lan == "es":
             if pos + '#' + synset in self.synsets_sp:
                 return self.synsets_sp[pos + '#' + synset]
             else:
@@ -400,8 +400,8 @@ class Resources:
         lang_from = self.map_lenguage[from_language]
         lang_to = self.map_lenguage[to_language]
         # Assert input params
-        assert (lang_from in ["sp", "en", "it", "pt", "fr"])
-        assert (lang_to in ["sp", "en", "it", "pt", "fr"])
+        assert (lang_from in ["es", "en", "it", "pt", "fr"])
+        assert (lang_to in ["es", "en", "it", "pt", "fr"])
         synset = self.get_first_synset(word, pos, from_language)
         if synset is not None:
             return self.get_words(synset, pos, to_language)
@@ -476,7 +476,7 @@ class Resources:
                 synsets = self.words_en[pos + '#' + word]["synsets"]
             else:
                 return None
-        if lan == "sp":
+        if lan == "es":
             if pos + '#' + word in self.words_sp:
                 synsets = self.words_sp[pos + '#' + word]["synsets"]
             else:
@@ -551,7 +551,7 @@ if __name__ == "__main__":
     print("Loaded time: %s\n" % (time.time() - time_start))
 
     # Some lookups
-    # words = [("unfortunately", "r", "english"), ("desafortunadamente", "r", "spanish"),
+    # words = [("unfortunately", "r", "english"), ("desafortunadamente", "r", ºanish"),
     #          ("exuberant", "a", "english"), ("stressful", "a", "english"), ("comfortably", "r", "english"),
     #          ("violación", "n", "spanish")]
     #
