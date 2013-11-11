@@ -4,6 +4,7 @@ import tornado.web
 import sys
 from api_resources import Resources
 from sentiment_analysis import SentimentAnalysis
+from solr_service import SolrService
 
 import time
 
@@ -240,6 +241,29 @@ class Translator(tornado.web.RequestHandler):
             # Return result
             self.write(response)
 
+class GetWebMining(tornado.web.RequestHandler):
+    def initialize(self):
+        self.solr_service = SolrService()
+
+    def get(self):
+        start = time.time()
+        domain = self.get_argument("domain")
+        term = self.get_argument("term")
+
+        result = self.solr_service.get_normalized_sentiment_emotion(term, domain)
+
+        if self.get_argument("format", None) == "onyx":
+            self.clear()
+            self.set_status(400)
+            self.finish("<html><body>ONYX response not implemented</body></html>")
+        else:
+            response = {}
+            response["result"] = result
+            response["elapsed_time"] = time.time() - start
+            self.write(response)
+
+
+
 # Check if server por is valid
 try:
     opts, args = getopt.getopt(sys.argv[1:], "p:", ["port="])
@@ -269,6 +293,7 @@ if __name__ == "__main__":
         (r"/get_dommain", GetDommain, dict(sentiwordnet=sentiwordnet)),
         (r"/get_word_information", GetWordInformation, dict(sentiwordnet=sentiwordnet)),
         (r"/get_sentiment_emotion", GetSentimentEmotion, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_web_mining", GetWebMining, {})
     ])
 
     # Listen on specific port and start server
