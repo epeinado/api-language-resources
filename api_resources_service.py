@@ -187,18 +187,17 @@ class PosTagging(tornado.web.RequestHandler):
             # Return result
             self.write(response)
 
-class GetInformation(tornado.web.RequestHandler):
+class GetSynsetInformation(tornado.web.RequestHandler):
     def initialize(self, sentiwordnet):
         self.sentiwordnet = sentiwordnet
 
     def get(self):
         start = time.time()
         # Check input text
-        word = self.get_argument("word")
+        word = self.get_argument("synset")
         pos = self.get_argument("pos")
-        language = self.get_argument("language")
 
-        score = sentiwordnet.get_info_first_word(word, pos, language)
+        score = sentiwordnet.get_info(word, pos)
 
         if self.get_argument("format", None) == "onyx":
             self.clear()
@@ -207,12 +206,11 @@ class GetInformation(tornado.web.RequestHandler):
         else:
             # Create DS to save result
             response = {}
-            response["score"] = score
+            response["info"] = score
 
             response["elapsed_time"] = time.time() - start
             # Return result
             self.write(response)
-
 
 class Translator(tornado.web.RequestHandler):
     def initialize(self, sentiwordnet):
@@ -284,7 +282,7 @@ if __name__ == "__main__":
 
     # Init Tornado web server
     application = tornado.web.Application([
-        (r"/get_information", GetInformation, dict(sentiwordnet=sentiwordnet)),
+        (r"/get_synset_information", GetSynsetInformation, dict(sentiwordnet=sentiwordnet)),
         (r"/translate", Translator, dict(sentiwordnet=sentiwordnet)),
         (r"/get_synonym", Synonym, dict(sentiwordnet=sentiwordnet)),
         (r"/get_postagging", PosTagging, dict(sentiwordnet=sentiwordnet)),
