@@ -21,7 +21,8 @@ class Resources:
                              "spanish": "sp",
                              "italian": "it",
                              "portuguese": "pt",
-                             "french": "fr"}
+                             "french": "fr",
+                             "catalan": "ct"}
 
         """
         Init TreeTagger
@@ -135,7 +136,7 @@ class Resources:
         Load words_fr
         """
         self.words_fr = {}
-        f_in = file("data/words/pt.tsv", "r")
+        f_in = file("data/words/fr.tsv", "r")
         for line in f_in:
             line = line.replace("\n", "")
             line = line.replace("\r", "")
@@ -144,6 +145,21 @@ class Resources:
             self.words_fr[chunks[0]]["word"] = chunks[1]
             self.words_fr[chunks[0]]["pos"] = chunks[2]
             self.words_fr[chunks[0]]["synsets"] = chunks[3].split(' ')
+        f_in.close()
+
+        """
+        Load words_ct
+        """
+        self.words_ct = {}
+        f_in = file("data/words/ct.tsv", "r")
+        for line in f_in:
+            line = line.replace("\n", "")
+            line = line.replace("\r", "")
+            chunks = line.split("\t")
+            self.words_ct[chunks[0]] = {}
+            self.words_ct[chunks[0]]["word"] = chunks[1]
+            self.words_ct[chunks[0]]["pos"] = chunks[2]
+            self.words_ct[chunks[0]]["synsets"] = chunks[3].split(' ')
         f_in.close()
 
         """
@@ -204,6 +220,17 @@ class Resources:
             line = line.replace("\n", "")
             chunks = line.split("\t")
             self.synsets_fr[chunks[0]] = chunks[1].split(' ')
+        f_in.close()
+
+        """
+        Load synsets_ct
+        """
+        self.synsets_ct = {}
+        f_in = file("data/synsets/ct.tsv", "r")
+        for line in f_in:
+            line = line.replace("\n", "")
+            chunks = line.split("\t")
+            self.synsets_ct[chunks[0]] = chunks[1].split(' ')
         f_in.close()
 
     def get_senti(self, synset, pos):
@@ -283,6 +310,11 @@ class Resources:
                 return self.words_fr[pos + '#' + word]["synsets"][0]
             else:
                 return None
+        if lan == "ct":
+            if pos + '#' + word in self.words_ct:
+                return self.words_ct[pos + '#' + word]["synsets"][0]
+            else:
+                return None
         else:
             return None
 
@@ -313,6 +345,11 @@ class Resources:
                 return self.synsets_fr[pos + '#' + synset]
             else:
                 return None
+        if lan == "ct":
+            if pos + '#' + synset in self.synsets_ct:
+                return self.synsets_ct[pos + '#' + synset]
+            else:
+                return None
         else:
             return None
 
@@ -329,6 +366,7 @@ class Resources:
         result["italian_words"] = self.get_words(synset, pos, "italian")
         result["portuguese_words"] = self.get_words(synset, pos, "portuguese")
         result["french_words"] = self.get_words(synset, pos, "french")
+        result["catalan_words"] = self.get_words(synset, pos, "catalan")
         return result
 
     def get_postagging(self, text, language):
@@ -394,14 +432,16 @@ class Resources:
                 # Lemma
                 element["lemma"] = postag[2]
                 response.append(element)
+        if language == "catalan":
+            response.append("Sorry, we don't have a Catalan Treetagger")
         return response
 
     def get_translation(self, word, pos, from_language, to_language):
         lang_from = self.map_lenguage[from_language]
         lang_to = self.map_lenguage[to_language]
         # Assert input params
-        assert (lang_from in ["sp", "en", "it", "pt", "fr"])
-        assert (lang_to in ["sp", "en", "it", "pt", "fr"])
+        assert (lang_from in ["sp", "en", "it", "pt", "fr", "ct"])
+        assert (lang_to in ["sp", "en", "it", "pt", "fr", "ct"])
         synset = self.get_first_synset(word, pos, from_language)
         if synset is not None:
             return self.get_words(synset, pos, to_language)
@@ -496,6 +536,11 @@ class Resources:
                 synsets = self.words_fr[pos + '#' + word]["synsets"]
             else:
                 return None
+        if lan == "ct":
+            if pos + '#' + word in self.words_ct:
+                synsets = self.words_ct[pos + '#' + word]["synsets"]
+            else:
+                return None
         results = {}
         for synset in synsets:
             results[synset+'#'+pos] = self.get_info(synset, pos)
@@ -577,8 +622,11 @@ if __name__ == "__main__":
     # print(sentiwordnet.get_postagging("I am a good boy", "english"))
 
     # print(sentiwordnet.get_affects("amado amado amado", "spanish"))
-    print("***INFO DE UNA PALABRA***")
-    print(sentiwordnet.get_info_word("good","n","english"))
+    # print("***INFO DE UNA PALABRA***")
+    # print(sentiwordnet.get_info_word("good","n","english"))
+
+    print("***INFO DE UN SYNSET***")
+    print(sentiwordnet.get_info("14441825","n"))
 
     # print(sentiwordnet.get_sentiment(
     #     "Cuando Gregorio Samsa se despertó una mañana después de un sueño intranquilo, se encontró sobre su cama convertido en un monstruoso insecto. Estaba tumbado sobre su espalda dura, y en forma de caparazón y, al levantar un poco la cabeza veía un vientre abombado, parduzco, dividido por partes duras en forma de arco, sobre cuya protuberancia apenas podía mantenerse el cobertor, a punto ya de resbalar al suelo. Sus muchas patas, ridículamente pequeñas en comparación con el resto de su tamaño, le vibraban desamparadas ante los ojos.",
